@@ -1,8 +1,10 @@
+import 'package:chatapp/providers/authentication_provider.dart';
 import 'package:chatapp/utilities/assets_manager.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
       body: Center(
         child: Padding(
@@ -128,9 +131,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       
                     ),
                   ),
-                  suffixIcon:  _phoneNumberController.text.length > 9 ? 
-                  InkWell(
+                  suffixIcon:  _phoneNumberController.text.length > 9 
+                  ? authProvider.isLoading
+                  ? const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  )
+                  : InkWell(
                      onTap: () {
+                      // sign in with phone number
+                      authProvider.signInWithPhoneNumber(
+                        phoneNumber: '+${selectedCountry.phoneCode}${_phoneNumberController.text}',
+                        context: context,
+                      );
                              
                     },
                     child: Container(
