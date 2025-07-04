@@ -72,10 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.done,
                 onChanged: (value) {
-                setState(() {
-                  _phoneNumberController.text = value;
-                });
-              },
+                  setState(() {
+                    _phoneNumberController.text = value;
+                  });
+                },
                 decoration: InputDecoration(
                   hintText: 'Số điện thoại',
                   hintStyle: GoogleFonts.openSans(
