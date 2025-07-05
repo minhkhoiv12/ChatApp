@@ -1,6 +1,9 @@
+import 'package:chatapp/constants.dart';
+import 'package:chatapp/providers/authentication_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
 
 class OTPScreen extends StatefulWidget {
   const OTPScreen({super.key});
@@ -36,6 +39,12 @@ class _OTPScreenState extends State<OTPScreen> {
   );
   @override
   Widget build(BuildContext context) {
+    // get the arguments
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+    final verificationId = args[Constants.verificationId] as String;
+    final phoneNumber = args[Constants.phoneNumber] as String;
+
+    final authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -65,7 +74,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Số điện thoại của bạn',
+                  phoneNumber,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.openSans(
                     fontSize: 18,
@@ -84,7 +93,7 @@ class _OTPScreenState extends State<OTPScreen> {
                       setState(() {
                         otpCode = pin;
                       });
-                      // verify otp code
+                     // verify otp code
                       verifyOTPCode(
                         verificationId: verificationId,
                         otpCode: otpCode!,
@@ -136,7 +145,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 authProvider.isLoading
                     ? const SizedBox.shrink()
                     : Text(
-                        'Không nhận được mã?',
+                        'Didn\'t receive the code?',
                         style: GoogleFonts.openSans(fontSize: 16),
                       ),
                 const SizedBox(height: 10),
@@ -152,12 +161,61 @@ class _OTPScreenState extends State<OTPScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
-                        )),
+                        )
+                      ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+  void verifyOTPCode({
+    required String verificationId,
+    required String otpCode,
+  }) async {
+    final authProvider = context.read<AuthenticationProvider>();
+    authProvider.verifyOTPCode(
+      verificationId: verificationId,
+      otpCode: otpCode,
+      context: context,
+      onSuccess: () async {
+        // 1. check if user exists in firestore
+        bool userExists = await authProvider.checkUserExists();
+
+        if (userExists) {
+          // 2. if user exists,
+
+          // * get user information from firestore
+          await authProvider.getUserDataFromFireStore();
+
+          // * save user information to provider / shared preferences
+          await authProvider.saveUserDataToSharedPreferences();
+
+          // * navigate to home screen
+          navigate(userExits: true);
+        } else {
+          // 3. if user doesn't exist, navigate to user information screen
+          navigate(userExits: false);
+        }
+      },
+    );
+  }
+  
+  void navigate({required bool userExits}) {
+    if (userExits) {
+      // navigate to home and remove all previous routes
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        Constants.homeScreen,
+        (route) => false,
+      );
+    } else {
+      // navigate to user information screen
+      Navigator.pushNamed(
+        context,
+        Constants.userInformationScreen,
+      );
+    }
   }
 }

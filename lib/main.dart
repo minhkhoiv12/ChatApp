@@ -1,5 +1,8 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:chatapp/authentication/login_screen.dart';
+import 'package:chatapp/authentication/opt_screen.dart';
+import 'package:chatapp/authentication/user_information_screen.dart';
+import 'package:chatapp/constants.dart';
 import 'package:chatapp/firebase_options.dart';
 import 'package:chatapp/main_screen/home_screen.dart';
 import 'package:chatapp/providers/authentication_provider.dart';
@@ -47,7 +50,25 @@ class MyApp extends StatelessWidget {
         title: 'Chat App',
         theme: theme,
         darkTheme: darkTheme,
-        home: const LoginScreen(),
+        initialRoute: Constants.loginScreen,
+       // home: const UserInformationScreen(),
+       routes: {
+         //Constants.landingScreen: (context) => const LandingScreen(),
+          Constants.loginScreen: (context) => const LoginScreen(),
+          Constants.otpScreen: (context) => const OTPScreen(),
+          Constants.userInformationScreen: (context) =>
+              const UserInformationScreen(),
+          Constants.homeScreen: (context) => const HomeScreen(),
+         // Constants.profileScreen: (context) => const ProfileScreen(),
+         // Constants.friendsScreen: (context) => const FriendsScreen(),
+          // Constants.friendRequestsScreen: (context) =>
+          //     const FriendRequestScreen(),
+        //  Constants.chatScreen: (context) => const ChatScreen(),
+          // Constants.groupSettingsScreen: (context) =>
+          //     const GroupSettingsScreen(),
+          // Constants.groupInformationScreen: (context) =>
+          //     const GroupInformationScreen(),
+        },
       ),
     );
   }
